@@ -1,18 +1,31 @@
 package website
 
 import (
-	"fmt"
+	"github.com/go-chi/chi/v5"
 	"net/http"
+	"robertkozin.com/services/imbox"
 )
 
-type Website struct {
+//embed:
 
+type Service struct {
+	Imbox *imbox.Service
+	Router chi.Router
 }
 
-func New() *Website {
-	return &Website{}
+func New() *Service {
+	return &Service{
+		Imbox: MustValue(imbox.New("./tmp/imbox")),
+	}
 }
 
-func (w *Website) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(res, "Hello, World")
+func (s *Service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	s.Router.ServeHTTP(res, req)
+}
+
+func MustValue[V any](value V, err error) V {
+	if err != nil {
+		panic(err)
+	}
+	return value
 }
